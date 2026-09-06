@@ -139,6 +139,19 @@ if (Is-UsableKey $envValues['OPENAI_MAAS_API_KEY'] -and $envValues.ContainsKey('
 } elseif (Is-UsableKey $envValues['ANTHROPIC_AUTH_TOKEN'] -and $envValues.ContainsKey('ANTHROPIC_BASE_URL')) {
     OpenClaw-Config 'models.providers.anthropic.apiKey' $envValues['ANTHROPIC_AUTH_TOKEN']; OpenClaw-Config 'models.providers.anthropic.baseUrl' $envValues['ANTHROPIC_BASE_URL']; OpenClaw-Config 'agents.defaults.model.primary' $(if ($envValues.ContainsKey('CLAUDE_MODEL')) { $envValues['CLAUDE_MODEL'] } else { 'anthropic/claude-sonnet-4-6' })
 } elseif (Is-UsableKey $envValues['ANTHROPIC_API_KEY']) { OpenClaw-Config 'models.providers.anthropic.apiKey' $envValues['ANTHROPIC_API_KEY']; OpenClaw-Config 'agents.defaults.model.primary' $(if ($envValues.ContainsKey('CLAUDE_MODEL')) { $envValues['CLAUDE_MODEL'] } else { 'anthropic/claude-sonnet-4-6' }) }
+$embeddingKeyNames = @('EASEL_EMBEDDING_API_KEY', 'EASEL_EMBEDDINGS_API_KEY', 'OPENAI_EMBEDDING_API_KEY', 'EMBEDDING_API_KEY', 'EMBEDDINGS_API_KEY')
+$embeddingUrlNames = @('EASEL_EMBEDDING_BASE_URL', 'EASEL_EMBEDDINGS_BASE_URL', 'OPENAI_EMBEDDING_BASE_URL', 'EMBEDDING_BASE_URL', 'EMBEDDINGS_BASE_URL')
+$embeddingModelNames = @('EASEL_EMBEDDING_MODEL', 'EASEL_EMBEDDINGS_MODEL', 'OPENAI_EMBEDDING_MODEL', 'EMBEDDING_MODEL', 'EMBEDDINGS_MODEL')
+$embeddingKey = $embeddingKeyNames | Where-Object { Is-UsableKey $envValues[$_] } | Select-Object -First 1
+$embeddingUrl = $embeddingUrlNames | Where-Object { -not [string]::IsNullOrWhiteSpace($envValues[$_]) } | Select-Object -First 1
+$embeddingModel = $embeddingModelNames | Where-Object { -not [string]::IsNullOrWhiteSpace($envValues[$_]) } | Select-Object -First 1
+if ($embeddingKey -and $embeddingUrl -and $embeddingModel) {
+    OpenClaw-Config 'agents.defaults.memorySearch.provider' 'openai-compatible'; OpenClaw-Config 'agents.defaults.memorySearch.model' $envValues[$embeddingModel]; OpenClaw-Config 'agents.defaults.memorySearch.remote.baseUrl' $envValues[$embeddingUrl]; OpenClaw-Config 'agents.defaults.memorySearch.remote.apiKey' $envValues[$embeddingKey]
+    Ok "独立向量模型已配置：$($envValues[$embeddingModel])"
+} else {
+    OpenClaw-Config 'agents.defaults.memorySearch.provider' 'none'
+    if (($embeddingKeyNames + $embeddingUrlNames + $embeddingModelNames | Where-Object { $envValues.ContainsKey($_) }).Count -gt 0) { Write-Warning '向量 API 配置不完整，已关闭向量检索；需要同时设置向量 API key、Base URL 和模型名' } else { Info '未配置独立向量 API，使用关键词记忆检索' }
+}
 OpenClaw-Config 'agents.defaults.timeoutSeconds' '7200'; OpenClaw-Config 'gateway.mode' 'local'; OpenClaw-Config 'gateway.bind' 'loopback'; OpenClaw-Config 'gateway.auth.mode' 'none'
 & openclaw --profile easel config validate
 if ($LASTEXITCODE -ne 0) { Fail 'OpenClaw 配置校验失败。' }

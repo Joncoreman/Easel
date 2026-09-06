@@ -490,8 +490,26 @@ $OC config set agents.defaults.model.primary "${CLAUDE_MODEL:-$DEFAULT_PRIMARY_M
 # 整个 agent run 的总时长上限。制作层任务（OpenClaw 自执行短剧/长稿/多镜）很久 → 给足。
 $OC config set agents.defaults.timeoutSeconds 7200 2>&1 | sed '/^No change$/d'
 # Easel 使用 profiles/<当前画像>/memory.md；关闭 OpenClaw 全局记忆索引，避免旧索引跨画像召回。
-# memorySearch was removed from the current OpenClaw schema; clear legacy values.
-$OC config unset agents.defaults.memorySearch >/dev/null 2>&1 || true
+# Easel 使用 profiles/<当前画像>/memory.md；向量记忆必须使用单独的 embedding API。
+# 否则 OpenClaw 会默认请求 text-embedding-3-small，很多聊天 MaaS 并不提供该模型。
+EMBEDDING_API_KEY="${EASEL_EMBEDDING_API_KEY:-${EASEL_EMBEDDINGS_API_KEY:-${OPENAI_EMBEDDING_API_KEY:-${EMBEDDING_API_KEY:-${EMBEDDINGS_API_KEY:-}}}}}"
+EMBEDDING_BASE_URL="${EASEL_EMBEDDING_BASE_URL:-${EASEL_EMBEDDINGS_BASE_URL:-${OPENAI_EMBEDDING_BASE_URL:-${EMBEDDING_BASE_URL:-${EMBEDDINGS_BASE_URL:-}}}}}"
+EMBEDDING_MODEL="${EASEL_EMBEDDING_MODEL:-${EASEL_EMBEDDINGS_MODEL:-${OPENAI_EMBEDDING_MODEL:-${EMBEDDING_MODEL:-${EMBEDDINGS_MODEL:-}}}}}"
+if [ -n "$EMBEDDING_API_KEY" ] && [ -n "$EMBEDDING_BASE_URL" ] && [ -n "$EMBEDDING_MODEL" ]; then
+    $OC config set agents.defaults.memorySearch.provider openai-compatible 2>&1 | sed '/^No change$/d'
+    $OC config set agents.defaults.memorySearch.model "$EMBEDDING_MODEL" 2>&1 | sed '/^No change$/d'
+    $OC config set agents.defaults.memorySearch.remote.baseUrl "$EMBEDDING_BASE_URL" 2>&1 | sed '/^No change$/d'
+    $OC config set agents.defaults.memorySearch.remote.apiKey "$EMBEDDING_API_KEY" 2>&1 | sed '/^No change$/d'
+    ok "独立向量模型已配置：$EMBEDDING_MODEL"
+else
+    # Deliberate FTS-only mode: never fall back to the chat endpoint for embeddings.
+    $OC config set agents.defaults.memorySearch.provider none 2>&1 | sed '/^No change$/d'
+    if [ -n "$EMBEDDING_API_KEY$EMBEDDING_BASE_URL$EMBEDDING_MODEL" ]; then
+        warn "向量 API 配置不完整，已关闭向量检索；需要同时设置 EASEL_EMBEDDING_API_KEY、EASEL_EMBEDDING_BASE_URL、EASEL_EMBEDDING_MODEL"
+    else
+        info "未配置独立向量 API，使用关键词记忆检索（不会请求 text-embedding-3-small）"
+    fi
+fi
 # 单次 LLM 请求的「空闲超时」（等模型开始/继续产出 token 的最长时间）。内部网关对大上下文/带思考的
 # 请求首 token 可能较慢，不设会用默认较短值 → 报「model did not produce a response before the model
 # idle timeout」而中断整个 run。与 agents.defaults.timeoutSeconds 是两回事，provider 超时不能延长整个 run。

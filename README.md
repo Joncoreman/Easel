@@ -261,6 +261,20 @@ OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_MODEL=gpt-4o
 ```
 
+如果聊天 API 不提供向量模型，请单独配置 Embedding API；否则 OpenClaw 会默认请求 `text-embedding-3-small`，可能得到“模型不可用”。不配置独立向量 API 时，Easel 会显式使用关键词记忆检索，不会反复请求聊天端点的 embedding 模型：
+
+```dotenv
+EASEL_EMBEDDING_API_KEY=你的向量_API_Key
+EASEL_EMBEDDING_BASE_URL=https://your-embedding-provider.example/v1
+EASEL_EMBEDDING_MODEL=你的向量模型名
+```
+
+修改向量 provider 或模型后，使用对应 profile 重建一次索引：
+
+```bash
+openclaw --profile easel memory index --force
+```
+
 或者使用其他 Anthropic-compatible 服务：
 
 ```bash
