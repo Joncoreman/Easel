@@ -42,7 +42,7 @@ Think of Easel as a content partner that remembers your positioning, audience, v
 
 Easel promotional demo:
 
-https://github.com/ZJU-REAL/Easel/raw/refs/heads/main/assets/readme/Easel-promo.mp4
+https://github.com/user-attachments/assets/91d2d2c1-7d3f-43f4-9479-70810657447a
 
 Easel follows five connected workflows: **Discover** relevant trends and opportunities, **Plan** topics, hooks, scripts, and schedules, **Produce** text, audio, and video, **Publish** checked and platform-ready content directly to the appropriate platforms, and **Attribute** performance insights back to the account profile.
 

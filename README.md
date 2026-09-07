@@ -42,7 +42,7 @@ Easel 是一个面向社交媒体创作者的开源内容工作台。它把 Open
 
 Easel 宣传演示：
 
-https://github.com/ZJU-REAL/Easel/raw/refs/heads/main/assets/readme/Easel-promo.mp4
+https://github.com/user-attachments/assets/91d2d2c1-7d3f-43f4-9479-70810657447a
 
 Easel 围绕五个连续工作流展开：**发现**适合账号的热点与机会，**策划**选题、标题、脚本和排期，
 **创作**图文、音频与视频内容，**发布**经过检查和平台适配的成品直接到对应平台，再通过**归因**分析表现并把有效经验沉淀回账号画像。
