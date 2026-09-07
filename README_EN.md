@@ -40,13 +40,9 @@ Easel is an open-source content workspace for social media creators. It connects
 
 Think of Easel as a content partner that remembers your positioning, audience, voice, platform constraints, preferences, and past performance. It stays with you from trend discovery through publishing, then carries what it learns into the next creation cycle.
 
-<p align="center">
-  <video src="assets/readme/Easel-promo-v9.mp4" controls="controls" preload="metadata" width="100%">
-    <a href="assets/readme/Easel-promo-v9.mp4">Play the Easel promotional demo</a>
-  </video>
-</p>
+Easel promotional demo:
 
-<p align="center"><sub>Easel promotional demo</sub></p>
+https://github.com/ZJU-REAL/Easel/raw/refs/heads/main/assets/readme/Easel-promo.mp4
 
 Easel follows five connected workflows: **Discover** relevant trends and opportunities, **Plan** topics, hooks, scripts, and schedules, **Produce** text, audio, and video, **Publish** checked and platform-ready content directly to the appropriate platforms, and **Attribute** performance insights back to the account profile.
 
