@@ -40,6 +40,14 @@ Easel 是一个面向社交媒体创作者的开源内容工作台。它把 Open
 
 你可以把它理解成一个会记住你的内容搭档：它了解账号定位、受众、风格、平台限制和历史表现，从热点发现一直陪你做到发布，再把结果带回下一次创作。
 
+<p align="center">
+  <video src="assets/readme/Easel-promo-v9.mp4" controls="controls" preload="metadata" width="100%">
+    <a href="assets/readme/Easel-promo-v9.mp4">播放 Easel 宣传演示视频</a>
+  </video>
+</p>
+
+<p align="center"><sub>Easel 宣传演示</sub></p>
+
 Easel 围绕五个连续工作流展开：**发现**适合账号的热点与机会，**策划**选题、标题、脚本和排期，
 **创作**图文、音频与视频内容，**发布**经过检查和平台适配的成品直接到对应平台，再通过**归因**分析表现并把有效经验沉淀回账号画像。
 
