@@ -30,6 +30,7 @@
   <a href="https://github.com/ZJU-REAL/Easel/stargazers"><img src="https://img.shields.io/github/stars/ZJU-REAL/Easel?style=flat-square&color=F6C344" alt="GitHub Stars"></a>
   <a href="https://github.com/ZJU-REAL/Easel/releases/latest"><img src="https://img.shields.io/github/v/release/ZJU-REAL/Easel?style=flat-square&color=0F9D8A&label=release" alt="Latest release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-2EA44F?style=flat-square" alt="License: Apache 2.0"></a>
+  <a href="assets/readme/wechat-group.png"><img src="https://img.shields.io/badge/微信群-加入交流-07C160?style=flat-square&logo=wechat&logoColor=white" alt="WeChat Group"></a>
 </p>
 
 ![Easel 产品宣传海报](assets/readme/poster.png)
@@ -226,14 +227,17 @@ Windows 安装器会优先通过 `winget` 自动安装缺失的 Python 3.10+、N
 
 如果已经提前配置了有效的 `.env`，安装器会复用配置，不会重复询问；如果使用重定向或 CI 等非交互模式，安装器会跳过提问并明确提示缺少的配置。
 
-安装完成后运行：
+安装完成后，`easel` 命令安装在项目的 `.venv` 中。先激活虚拟环境再运行（每次新开终端都要先激活）：
 
 ```bash
+source .venv/bin/activate    # 激活后 easel 命令才可用（Windows：.venv\Scripts\activate）
 easel doctor                 # 检查运行环境
 easel ping                   # 实际测试 gateway 和 Agent
 easel web                    # 启动 Web 工作台
 # 或：easel chat              # 启动终端对话
 ```
+
+> 如果提示 `easel: command not found`，就是虚拟环境没激活。也可以不激活、直接用完整路径运行，例如 `.venv/bin/easel doctor`（Windows：`.venv\Scripts\easel.exe doctor`）。
 
 启动 Web 工作台后访问 `http://localhost:7860`。安装完成后可以运行 `easel doctor` 检查环境，
 运行 `easel ping` 检查 gateway 和 Agent 连通性。
@@ -362,6 +366,13 @@ Easel 使用独立的 `easel` OpenClaw profile，不会覆盖你本机已有的 
 
 Easel 的技能体系和工作流受益于许多优秀的开源项目、工具与内容方法论。感谢所有原作者和社区贡献者；
 具体项目、用途和许可信息请查看[完整致谢](docs/ACKNOWLEDGMENTS.md)。
+
+欢迎参与贡献与讨论。有想法、问题或改进建议，欢迎提交 Issue 或 PR；也欢迎扫码加入我们的微信交流群：
+
+<p align="center">
+  <img src="assets/readme/wechat-group.png" width="240" alt="Easel 微信交流群二维码">
+</p>
+<p align="center"><sub>Easel 交流群 · 二维码定期更新，若已失效请通过 Issue 联系我们</sub></p>
 
 ### 🤝 Contributors
 

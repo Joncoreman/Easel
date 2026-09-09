@@ -551,6 +551,10 @@ echo -e "\n${GREEN}╭───────────────────�
 echo -e "${GREEN}│${NC}  ${GREEN}✓ Easel 安装完成${NC}                              ${GREEN}│${NC}"
 echo -e "${GREEN}╰────────────────────────────────────────────────────╯${NC}"
 echo -e "\n  ${CYAN}开始使用：${NC}"
+if [ -x "$PROJECT_ROOT/.venv/bin/easel" ]; then
+    echo -e "    ${CYAN}source .venv/bin/activate${NC}    # 先激活虚拟环境，easel 命令才可用"
+    echo -e "    ${DIM}# 新开终端都要先激活；或不激活直接用 .venv/bin/easel <命令>${NC}"
+fi
 echo "    easel web                    # 启动 Web 工作台"
 echo "    easel chat                   # 终端对话"
 echo "    easel doctor                 # 检查环境"

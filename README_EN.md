@@ -30,6 +30,7 @@
   <a href="https://github.com/ZJU-REAL/Easel/stargazers"><img src="https://img.shields.io/github/stars/ZJU-REAL/Easel?style=flat-square&color=F6C344" alt="GitHub Stars"></a>
   <a href="https://github.com/ZJU-REAL/Easel/releases/latest"><img src="https://img.shields.io/github/v/release/ZJU-REAL/Easel?style=flat-square&color=0F9D8A&label=release" alt="Latest release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-2EA44F?style=flat-square" alt="License: Apache 2.0"></a>
+  <a href="assets/readme/wechat-group.png"><img src="https://img.shields.io/badge/WeChat-Join_Group-07C160?style=flat-square&logo=wechat&logoColor=white" alt="WeChat Group"></a>
 </p>
 
 ![Easel product poster](assets/readme/poster.png)
@@ -162,9 +163,12 @@ Requirements: Linux or macOS, Python 3.10+, and Git. The installer checks Node.j
 git clone git@github.com:ZJU-REAL/Easel.git
 cd Easel
 bash setup.sh
+source .venv/bin/activate    # easel is installed in .venv; activate it first (Windows: .venv\Scripts\activate)
 easel web
 # Or: easel chat
 ```
+
+> If you see `easel: command not found`, the virtual environment is not activated. You can also run it by full path without activating, e.g. `.venv/bin/easel doctor` (Windows: `.venv\Scripts\easel.exe doctor`).
 
 `bash setup.sh` is a rerunnable guided installer. It detects and reuses an existing local OpenClaw
 installation without touching `~/.openclaw/`; Easel uses its isolated `~/.openclaw-easel/` profile.
@@ -257,6 +261,13 @@ Easel uses an isolated `easel` OpenClaw profile and does not overwrite an existi
 ## 🙏 Acknowledgments
 
 Easel's Skill system and workflows benefit from many excellent open-source projects, tools, and content methodologies. We thank their original authors and contributors. See the [full acknowledgments](docs/ACKNOWLEDGMENTS.md) for projects, usage, and license information.
+
+Contributions and discussion are welcome. If you have ideas, questions, or improvements, feel free to open an Issue or PR — or scan the QR code to join our WeChat group:
+
+<p align="center">
+  <img src="assets/readme/wechat-group.png" width="240" alt="Easel WeChat group QR code">
+</p>
+<p align="center"><sub>Easel WeChat group · the QR code is refreshed periodically; if it has expired, reach us via Issues</sub></p>
 
 ### 🤝 Contributors
 
