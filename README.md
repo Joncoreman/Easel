@@ -377,3 +377,11 @@ Easel 的技能体系和工作流受益于许多优秀的开源项目、工具�
 ## ⚖️ 许可证
 
 [Apache 2.0](LICENSE)
+
+## 🌟 Star 趋势
+
+<p align="center">
+  <a href="https://star-history.com/#ZJU-REAL/Easel&Date">
+    <img src="https://api.star-history.com/svg?repos=ZJU-REAL/Easel&type=Date" width="720" alt="Easel Star History Chart">
+  </a>
+</p>

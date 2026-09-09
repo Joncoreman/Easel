@@ -272,3 +272,11 @@ Easel's Skill system and workflows benefit from many excellent open-source proje
 ## ⚖️ License
 
 [Apache 2.0](LICENSE)
+
+## 🌟 Star History
+
+<p align="center">
+  <a href="https://star-history.com/#ZJU-REAL/Easel&Date">
+    <img src="https://api.star-history.com/svg?repos=ZJU-REAL/Easel&type=Date" width="720" alt="Easel Star History Chart">
+  </a>
+</p>
