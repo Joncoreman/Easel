@@ -138,7 +138,17 @@ if (Is-UsableKey $envValues['OPENAI_MAAS_API_KEY'] -and $envValues.ContainsKey('
     OpenClaw-Config 'models.providers.anthropic.apiKey' $envValues['EASEL_LLM_API_KEY']; OpenClaw-Config 'models.providers.anthropic.baseUrl' $envValues['EASEL_LLM_BASE_URL']; OpenClaw-Config 'models.providers.anthropic.headers.api-key' $envValues['EASEL_LLM_API_KEY']; OpenClaw-Config 'agents.defaults.model.primary' $(if ($envValues.ContainsKey('CLAUDE_MODEL')) { $envValues['CLAUDE_MODEL'] } else { 'anthropic/claude-sonnet-4-6' })
 } elseif (Is-UsableKey $envValues['ANTHROPIC_AUTH_TOKEN'] -and $envValues.ContainsKey('ANTHROPIC_BASE_URL')) {
     OpenClaw-Config 'models.providers.anthropic.apiKey' $envValues['ANTHROPIC_AUTH_TOKEN']; OpenClaw-Config 'models.providers.anthropic.baseUrl' $envValues['ANTHROPIC_BASE_URL']; OpenClaw-Config 'agents.defaults.model.primary' $(if ($envValues.ContainsKey('CLAUDE_MODEL')) { $envValues['CLAUDE_MODEL'] } else { 'anthropic/claude-sonnet-4-6' })
-} elseif (Is-UsableKey $envValues['ANTHROPIC_API_KEY']) { OpenClaw-Config 'models.providers.anthropic.apiKey' $envValues['ANTHROPIC_API_KEY']; OpenClaw-Config 'agents.defaults.model.primary' $(if ($envValues.ContainsKey('CLAUDE_MODEL')) { $envValues['CLAUDE_MODEL'] } else { 'anthropic/claude-sonnet-4-6' }) }
+} elseif (Is-UsableKey $envValues['ANTHROPIC_API_KEY']) {
+    OpenClaw-Config 'models.providers.anthropic.apiKey' $envValues['ANTHROPIC_API_KEY']
+    # 官方 ANTHROPIC_API_KEY 也可搭配 ANTHROPIC_BASE_URL 指向自定义代理/网关；
+    # 否则请求会发往默认的 api.anthropic.com，代理网络下会直接超时。
+    if (-not [string]::IsNullOrWhiteSpace($envValues['ANTHROPIC_BASE_URL'])) {
+        OpenClaw-Config 'models.providers.anthropic.baseUrl' $envValues['ANTHROPIC_BASE_URL']
+    } else {
+        & openclaw --profile easel config unset models.providers.anthropic.baseUrl 2>&1 | Out-Null
+    }
+    OpenClaw-Config 'agents.defaults.model.primary' $(if ($envValues.ContainsKey('CLAUDE_MODEL')) { $envValues['CLAUDE_MODEL'] } else { 'anthropic/claude-sonnet-4-6' })
+}
 $embeddingKeyNames = @('EASEL_EMBEDDING_API_KEY', 'EASEL_EMBEDDINGS_API_KEY', 'OPENAI_EMBEDDING_API_KEY', 'EMBEDDING_API_KEY', 'EMBEDDINGS_API_KEY')
 $embeddingUrlNames = @('EASEL_EMBEDDING_BASE_URL', 'EASEL_EMBEDDINGS_BASE_URL', 'OPENAI_EMBEDDING_BASE_URL', 'EMBEDDING_BASE_URL', 'EMBEDDINGS_BASE_URL')
 $embeddingModelNames = @('EASEL_EMBEDDING_MODEL', 'EASEL_EMBEDDINGS_MODEL', 'OPENAI_EMBEDDING_MODEL', 'EMBEDDING_MODEL', 'EMBEDDINGS_MODEL')

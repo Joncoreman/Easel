@@ -478,7 +478,16 @@ elif [ -n "${ANTHROPIC_AUTH_TOKEN:-}" ] && [ -n "${ANTHROPIC_BASE_URL:-}" ]; the
     ok "Anthropic 兼容服务认证已同步"
 elif [ -n "${ANTHROPIC_API_KEY:-}" ] && [ "$ANTHROPIC_API_KEY" != "sk-ant-REPLACE_ME" ]; then
     $OC config set models.providers.anthropic.apiKey "$ANTHROPIC_API_KEY" 2>&1 | sed '/^No change$/d'
-    ok "API key 已同步"
+    # 官方 ANTHROPIC_API_KEY 也可搭配 ANTHROPIC_BASE_URL 指向自定义代理/网关；
+    # 否则请求会发往默认的 api.anthropic.com，代理网络下会直接超时。
+    if [ -n "${ANTHROPIC_BASE_URL:-}" ]; then
+        $OC config set models.providers.anthropic.baseUrl "$ANTHROPIC_BASE_URL" 2>&1 | sed '/^No change$/d'
+        ok "API key + 自定义 Anthropic Base URL 已同步"
+    else
+        # 未指定 Base URL：清除历史自定义值，回落到官方端点
+        $OC config unset models.providers.anthropic.baseUrl >/dev/null 2>&1 || true
+        ok "API key 已同步"
+    fi
 else
     warn "认证未配置 — 编辑 .env 后重新运行 bash setup.sh"
 fi
