@@ -284,6 +284,42 @@ bash "$PROJECT_ROOT/openclaw/sync.sh" 2>&1 | grep -E '✓|→'
 info "同步认证到 OpenClaw profile..."
 source "$PROJECT_ROOT/.env" 2>/dev/null || true
 
+# 部分 OpenClaw 版本执行 config unset 后会把字段留成 null 而非真正删除该键，
+# 一旦落盘就再也无法通过 config set/doctor --fix 修复（每次校验都先失败）。
+# 这里在写入任何配置前，先把 models.providers.* 下残留的 null 叶子节点原地清空。
+OPENCLAW_JSON="$HOME/.openclaw-${PROFILE}/openclaw.json"
+if [ -f "$OPENCLAW_JSON" ]; then
+    python3 - "$OPENCLAW_JSON" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+with open(path) as f:
+    config = json.load(f)
+
+
+def strip_nulls(node):
+    if isinstance(node, dict):
+        changed = False
+        for key in list(node.keys()):
+            value = node[key]
+            if value is None:
+                del node[key]
+                changed = True
+            elif strip_nulls(value):
+                changed = True
+        return changed
+    return False
+
+
+providers = config.get("models", {}).get("providers", {})
+if strip_nulls(providers):
+    with open(path, "w") as f:
+        json.dump(config, f, indent=2)
+        f.write("\n")
+PY
+fi
+
 # 若用户已有默认 OpenClaw 配置，复用其模型名称；密钥不会从别的 profile 复制。
 if [ -z "${CLAUDE_MODEL:-}" ] && [ -z "${ANTHROPIC_API_KEY:-}" ] && [ -t 0 ]; then
     EXISTING_MODEL="$($OPENCLAW_BIN config get agents.defaults.model.primary 2>/dev/null || true)"
@@ -484,8 +520,11 @@ elif [ -n "${ANTHROPIC_API_KEY:-}" ] && [ "$ANTHROPIC_API_KEY" != "sk-ant-REPLAC
         $OC config set models.providers.anthropic.baseUrl "$ANTHROPIC_BASE_URL" 2>&1 | sed '/^No change$/d'
         ok "API key + 自定义 Anthropic Base URL 已同步"
     else
-        # 未指定 Base URL：清除历史自定义值，回落到官方端点
-        $OC config unset models.providers.anthropic.baseUrl >/dev/null 2>&1 || true
+        # 未指定 Base URL：显式指向官方端点。不用 config unset ——
+        # 部分 OpenClaw 版本执行 unset 后把该字段留成 null 而非真正删除，
+        # 导致后续任意 config 操作都因 schema 类型不匹配而报错；
+        # 也不能设为空字符串，OpenClaw 会以“长度需 >=1”拒绝该写入。
+        $OC config set models.providers.anthropic.baseUrl "https://api.anthropic.com" 2>&1 | sed '/^No change$/d'
         ok "API key 已同步"
     fi
 else

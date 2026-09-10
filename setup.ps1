@@ -123,6 +123,42 @@ if (-not (Is-UsableKey $envValues['ANTHROPIC_API_KEY']) -and -not (Is-UsableKey 
     elseif ($choice -eq '1' -or [string]::IsNullOrWhiteSpace($choice)) { $key = Read-Secret 'Anthropic API Key（不会回显）'; $model = Read-Host '模型 [anthropic/claude-sonnet-4-6]'; Add-Content $envPath "`nANTHROPIC_API_KEY=$key`nCLAUDE_MODEL=$model" }
 }
 $envValues = Read-EnvFile $envPath
+
+# 部分 OpenClaw 版本执行 config unset 后会把字段留成 null 而非真正删除该键，
+# 一旦落盘就再也无法通过 config set/doctor --fix 修复（每次校验都先失败）。
+# 这里在写入任何配置前，先把 models.providers.* 下残留的 null 叶子节点原地清空。
+$openclawJson = Join-Path $HOME '.openclaw-easel\openclaw.json'
+if (Test-Path $openclawJson) {
+    & $Python -c @'
+import json, sys
+
+path = sys.argv[1]
+with open(path) as f:
+    config = json.load(f)
+
+
+def strip_nulls(node):
+    if isinstance(node, dict):
+        changed = False
+        for key in list(node.keys()):
+            value = node[key]
+            if value is None:
+                del node[key]
+                changed = True
+            elif strip_nulls(value):
+                changed = True
+        return changed
+    return False
+
+
+providers = config.get("models", {}).get("providers", {})
+if strip_nulls(providers):
+    with open(path, "w") as f:
+        json.dump(config, f, indent=2)
+        f.write("\n")
+'@ $openclawJson
+}
+
 if (Is-UsableKey $envValues['OPENAI_MAAS_API_KEY'] -and $envValues.ContainsKey('OPENAI_MAAS_ENDPOINT')) {
     $model = if ($envValues.ContainsKey('OPENAI_MAAS_MODEL')) { $envValues['OPENAI_MAAS_MODEL'] } else { 'gpt-5.5' }
     $port = if ($envValues.ContainsKey('OPENAI_MAAS_ADAPTER_PORT')) { $envValues['OPENAI_MAAS_ADAPTER_PORT'] } else { '18791' }
@@ -145,7 +181,11 @@ if (Is-UsableKey $envValues['OPENAI_MAAS_API_KEY'] -and $envValues.ContainsKey('
     if (-not [string]::IsNullOrWhiteSpace($envValues['ANTHROPIC_BASE_URL'])) {
         OpenClaw-Config 'models.providers.anthropic.baseUrl' $envValues['ANTHROPIC_BASE_URL']
     } else {
-        & openclaw --profile easel config unset models.providers.anthropic.baseUrl 2>&1 | Out-Null
+        # 未指定 Base URL：显式指向官方端点。不用 config unset ——
+        # 部分 OpenClaw 版本执行 unset 后把该字段留成 null 而非真正删除，
+        # 导致后续任意 config 操作都因 schema 类型不匹配而报错；
+        # 也不能设为空字符串，OpenClaw 会以“长度需 >=1”拒绝该写入。
+        OpenClaw-Config 'models.providers.anthropic.baseUrl' 'https://api.anthropic.com'
     }
     OpenClaw-Config 'agents.defaults.model.primary' $(if ($envValues.ContainsKey('CLAUDE_MODEL')) { $envValues['CLAUDE_MODEL'] } else { 'anthropic/claude-sonnet-4-6' })
 }
